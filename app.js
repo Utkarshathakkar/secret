@@ -1,14 +1,12 @@
 require('dotenv').config();
-
-
 const express=require("express");
 const mongoose=require("mongoose");
 const bodyparser=require("body-parser");
 const ejs=require("ejs");
 const path=require("path");
-const encryption=require("mongoose-encryption");
+const encrypt=require("mongoose-encryption");
 const app=express();
-
+console.log(process.env.API_KEY);
 
 const staticpath=path.join(__dirname ,'public');
 mongoose.connect("mongodb://127.0.0.1:27017/signinform",{useNewurlparser:true})
@@ -24,11 +22,8 @@ const itemschema=new mongoose.Schema({
     password:String
 });
 
-var secret="My name is thakkar utkarsh";
-itemschema.plugin(encryption,{secret:secret,encryptedFields:["password"]});
 
-
-
+itemschema.plugin(encrypt,{secret:process.env.SECRET,encryptedFields:["password"]});
 
 const Model=new mongoose.model("Model",itemschema);
 
@@ -61,7 +56,8 @@ app.post("/register",(req,res) =>{
     });
 
   const insertdocument=  async ()=>{
-       const result=await  Model.insertMany([newuser]) ;
+    await  Model.insertMany([newuser]) ;
+    res.render('secrets');
   }
   insertdocument();
 

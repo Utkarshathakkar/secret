@@ -4,9 +4,11 @@ const mongoose=require("mongoose");
 const bodyparser=require("body-parser");
 const ejs=require("ejs");
 const path=require("path");
+const  md5=require('md5');
+//
 const encrypt=require("mongoose-encryption");
 const app=express();
-console.log(process.env.API_KEY);
+ // console.log(process.env.API_KEY);
 
 const staticpath=path.join(__dirname ,'public');
 mongoose.connect("mongodb://127.0.0.1:27017/signinform",{useNewurlparser:true})
@@ -23,7 +25,7 @@ const itemschema=new mongoose.Schema({
 });
 
 
-itemschema.plugin(encrypt,{secret:process.env.SECRET,encryptedFields:["password"]});
+//itemschema.plugin(encrypt,{secret:process.env.SECRET,encryptedFields:["password"]});
 
 const Model=new mongoose.model("Model",itemschema);
 
@@ -52,7 +54,7 @@ app.get("/register",(req,res) =>{
 app.post("/register",(req,res) =>{
     const newuser=new Model({
         email:req.body.username,
-        password:req.body.password
+        password:md5(req.body.password)
     });
 
   const insertdocument=  async ()=>{
@@ -65,7 +67,7 @@ app.post("/register",(req,res) =>{
 });
 app.post("/login",(req,res)=>{
    const username=req.body.username;
-   const password=req.body.password;
+   const password=md(req.body.password);
 
    const finddocument=async ()=>{
       const result= await Model.findOne({email:username});

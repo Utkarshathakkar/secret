@@ -4,7 +4,8 @@ const mongoose=require("mongoose");
 const bodyparser=require("body-parser");
 const ejs=require("ejs");
 const path=require("path");
-const  md5=require('md5');
+const bcrypt=require("bcrypt");
+const saltround=10;
 //
 const encrypt=require("mongoose-encryption");
 const app=express();
@@ -52,16 +53,20 @@ app.get("/register",(req,res) =>{
 });
 
 app.post("/register",(req,res) =>{
-    const newuser=new Model({
-        email:req.body.username,
-        password:md5(req.body.password)
-    });
 
-  const insertdocument=  async ()=>{
-    await  Model.insertMany([newuser]) ;
-    res.render('secrets');
-  }
-  insertdocument();
+    bcrypt.hash(req.body.password,saltround,(err,hash)=>{
+        const newuser=new Model({
+            email:req.body.username,
+            password:hash
+        });
+    
+      const insertdocument=  async ()=>{
+        await  Model.insertMany([newuser]) ;
+        res.render('secrets');
+      }
+      insertdocument()
+    });
+    
 
 
 });

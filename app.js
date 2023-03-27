@@ -72,13 +72,15 @@ app.post("/register",(req,res) =>{
 });
 app.post("/login",(req,res)=>{
    const username=req.body.username;
-   const password=md(req.body.password);
+   const password=req.body.password
 
    const finddocument=async ()=>{
       const result= await Model.findOne({email:username});
-      if(result.password===password){
-        res.render("secrets");
-      }
+      bcrypt.compare(password,result.password,(err,result)=>{
+        if(result===true){
+            res.render('secret');
+        }
+      })
    };
    finddocument();
 });
